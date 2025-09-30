@@ -1,0 +1,95 @@
+# Ignore common operating system and editor files
+.DS_Store
+Thumbs.db
+
+# Ignore build products
+*.o
+*.a
+*.so
+*.lo
+*.la
+*.dll
+*.exe
+*.obj
+*.ilk
+*.pdb
+*.lib
+*.exp
+*.com
+*.bak
+*.rej
+*.swo
+*.swp
+*.swn
+*.pyc
+*.pyo
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Ignore IDE and editor specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.project
+*.metadata
+*.settings
+*.tmproj
+*.esproj
+
+# Ignore node_modules and pnpm store
+node_modules/
+pnpm-lock.yaml
+.pnpm-store/
+.local/share/pnpm/
+
+# Ignore NVM files
+.nvm/
+
+# Ignore Composer dependencies
+vendor/
+composer.lock
+
+# Ignore environment variables file
+.env
+
+# Ignore uploads folder
+uploads/
+
+# Ignore any local configuration files that should not be committed
+config.local.php
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*~
+
+# Ignore browser data directory
+.browser_data_dir/
+
+# Ignore sandbox specific files
+sandbox.txt
+.bash_logout
+.bashrc
+.cache/
+.config/
+.gitconfig
+.local/
+.logs/
+.npm/
+.pki/
+.profile
+.secrets/
+.user_env
+.zshrc
+.bash_history
+
