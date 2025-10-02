@@ -44,63 +44,73 @@ $cases = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/mobile-ionic.css">
     <title>إدارة القضايا - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="sidebar">
-            <h3>مرحباً <?php echo htmlspecialchars($_SESSION['user_name']); ?></h3>
-            <ul>
-                <li><a href="dashboard.php">الرئيسية</a></li>
-                <li><a href="cases.php" class="active">إدارة القضايا</a></li>
-                <li><a href="consultations.php">الاستشارات</a></li>
-                <li><a href="clients.php">العملاء</a></li>
-                <li><a href="reports.php">التقارير</a></li>
-                <li><a href="../logout.php">تسجيل الخروج</a></li>
-            </ul>
-        </div>
-        
-        <div class="main-content">
-            <div class="header">
-                <h1>إدارة القضايا</h1>
-                <p>عرض وإدارة جميع القضايا المسندة إليك</p>
-            </div>
-            
-            <?php if ($success): ?>
-                <div class="success-message"><?php echo $success; ?></div>
-            <?php endif; ?>
-            
-            <?php if ($error): ?>
-                <div class="error-message"><?php echo $error; ?></div>
-            <?php endif; ?>
-            
-            <!-- فلاتر القضايا -->
-            <div class="card">
-                <div class="filters">
-                    <h3>تصفية القضايا:</h3>
-                    <div class="filter-buttons">
-                        <a href="cases.php?filter=all" class="filter-btn <?php echo $filter === 'all' ? 'active' : ''; ?>">الكل</a>
-                        <a href="cases.php?filter=new" class="filter-btn <?php echo $filter === 'new' ? 'active' : ''; ?>">جديدة</a>
-                        <a href="cases.php?filter=in_progress" class="filter-btn <?php echo $filter === 'in_progress' ? 'active' : ''; ?>">قيد المعالجة</a>
-                        <a href="cases.php?filter=closed" class="filter-btn <?php echo $filter === 'closed' ? 'active' : ''; ?>">مغلقة</a>
-                        <a href="cases.php?filter=archived" class="filter-btn <?php echo $filter === 'archived' ? 'active' : ''; ?>">مؤرشفة</a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- قائمة القضايا -->
-            <div class="card">
-                <h2>القضايا (<?php echo count($cases); ?>)</h2>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-back-button default-href="dashboard.php"></ion-back-button>
+                </ion-buttons>
+                <ion-title>إدارة القضايا</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+            <div class="content-section">
+                <?php if ($success): ?>
+                    <ion-item color="success" class="ion-margin-bottom">
+                        <ion-icon slot="start" name="checkmark-circle"></ion-icon>
+                        <ion-label><?php echo $success; ?></ion-label>
+                    </ion-item>
+                <?php endif; ?>
+                
+                <?php if ($error): ?>
+                    <ion-item color="danger" class="ion-margin-bottom">
+                        <ion-icon slot="start" name="alert-circle"></ion-icon>
+                        <ion-label><?php echo $error; ?></ion-label>
+                    </ion-item>
+                <?php endif; ?>
+                
+                <!-- فلاتر القضايا -->
+                <ion-card>
+                    <ion-card-header>
+                        <ion-card-title>تصفية القضايا</ion-card-title>
+                    </ion-card-header>
+                    <ion-card-content>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <ion-button href="cases.php?filter=all" size="small" fill="<?php echo $filter === 'all' ? 'solid' : 'outline'; ?>">
+                                الكل
+                            </ion-button>
+                            <ion-button href="cases.php?filter=new" size="small" fill="<?php echo $filter === 'new' ? 'solid' : 'outline'; ?>" color="primary">
+                                جديدة
+                            </ion-button>
+                            <ion-button href="cases.php?filter=in_progress" size="small" fill="<?php echo $filter === 'in_progress' ? 'solid' : 'outline'; ?>" color="warning">
+                                قيد المعالجة
+                            </ion-button>
+                            <ion-button href="cases.php?filter=closed" size="small" fill="<?php echo $filter === 'closed' ? 'solid' : 'outline'; ?>" color="success">
+                                مغلقة
+                            </ion-button>
+                            <ion-button href="cases.php?filter=archived" size="small" fill="<?php echo $filter === 'archived' ? 'solid' : 'outline'; ?>" color="medium">
+                                مؤرشفة
+                            </ion-button>
+                        </div>
+                    </ion-card-content>
+                </ion-card>
+                
+                <!-- قائمة القضايا -->
+                <h2 class="section-title">القضايا (<?php echo count($cases); ?>)</h2>
                 
                 <?php if (count($cases) > 0): ?>
-                    <div class="cases-grid">
-                        <?php foreach ($cases as $case): ?>
-                            <div class="case-card">
-                                <div class="case-header">
-                                    <h4><?php echo htmlspecialchars($case['title']); ?></h4>
-                                    <span class="status-<?php echo $case['status']; ?>">
+                    <?php foreach ($cases as $case): ?>
+                        <ion-card>
+                            <ion-card-header>
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <ion-card-title><?php echo htmlspecialchars($case['title']); ?></ion-card-title>
+                                    <span class="status-badge status-<?php echo $case['status']; ?>">
                                         <?php 
                                         $status_names = [
                                             'new' => 'جديدة',
@@ -112,41 +122,75 @@ $cases = $stmt->fetchAll();
                                         ?>
                                     </span>
                                 </div>
+                            </ion-card-header>
+                            <ion-card-content>
+                                <ion-list lines="none">
+                                    <ion-item>
+                                        <ion-icon name="person" slot="start" color="primary"></ion-icon>
+                                        <ion-label>
+                                            <p>العميل</p>
+                                            <h3><?php echo htmlspecialchars($case['client_name']); ?></h3>
+                                        </ion-label>
+                                    </ion-item>
+                                    <ion-item>
+                                        <ion-icon name="mail" slot="start" color="primary"></ion-icon>
+                                        <ion-label>
+                                            <p>البريد</p>
+                                            <h3><?php echo htmlspecialchars($case['client_email']); ?></h3>
+                                        </ion-label>
+                                    </ion-item>
+                                    <ion-item>
+                                        <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+                                        <ion-label>
+                                            <p>تاريخ الإنشاء</p>
+                                            <h3><?php echo date('Y-m-d H:i', strtotime($case['created_at'])); ?></h3>
+                                        </ion-label>
+                                    </ion-item>
+                                </ion-list>
                                 
-                                <div class="case-info">
-                                    <p><strong>العميل:</strong> <?php echo htmlspecialchars($case['client_name']); ?></p>
-                                    <p><strong>البريد:</strong> <?php echo htmlspecialchars($case['client_email']); ?></p>
-                                    <p><strong>تاريخ الإنشاء:</strong> <?php echo date('Y-m-d H:i', strtotime($case['created_at'])); ?></p>
+                                <p style="margin-top: 12px; color: #666;">
+                                    <?php echo htmlspecialchars(substr($case['details'], 0, 150)) . '...'; ?>
+                                </p>
+                                
+                                <div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
+                                    <ion-button href="case_details.php?id=<?php echo $case['id']; ?>" size="small" fill="solid">
+                                        <ion-icon slot="start" name="document-text"></ion-icon>
+                                        التفاصيل
+                                    </ion-button>
+                                    <ion-button href="../chat.php?case_id=<?php echo $case['id']; ?>" size="small" fill="outline">
+                                        <ion-icon slot="start" name="chatbubbles"></ion-icon>
+                                        محادثة
+                                    </ion-button>
                                 </div>
                                 
-                                <div class="case-details">
-                                    <p><?php echo htmlspecialchars(substr($case['details'], 0, 150)) . '...'; ?></p>
-                                </div>
-                                
-                                <div class="case-actions">
-                                    <a href="case_details.php?id=<?php echo $case['id']; ?>" class="btn-small">عرض التفاصيل</a>
-                                    <a href="chat.php?case_id=<?php echo $case['id']; ?>" class="btn-small">محادثة</a>
-                                    
-                                    <!-- تحديث الحالة -->
-                                    <form method="POST" class="status-form" style="display: inline;">
-                                        <input type="hidden" name="case_id" value="<?php echo $case['id']; ?>">
-                                        <select name="status" onchange="this.form.submit()">
-                                            <option value="new" <?php echo $case['status'] === 'new' ? 'selected' : ''; ?>>جديدة</option>
-                                            <option value="in_progress" <?php echo $case['status'] === 'in_progress' ? 'selected' : ''; ?>>قيد المعالجة</option>
-                                            <option value="closed" <?php echo $case['status'] === 'closed' ? 'selected' : ''; ?>>مغلقة</option>
-                                            <option value="archived" <?php echo $case['status'] === 'archived' ? 'selected' : ''; ?>>مؤرشفة</option>
-                                        </select>
-                                        <input type="hidden" name="update_status" value="1">
-                                    </form>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+                                <!-- تحديث الحالة -->
+                                <form method="POST" style="margin-top: 12px;">
+                                    <input type="hidden" name="case_id" value="<?php echo $case['id']; ?>">
+                                    <input type="hidden" name="update_status" value="1">
+                                    <ion-item>
+                                        <ion-label>تحديث الحالة:</ion-label>
+                                        <ion-select name="status" value="<?php echo $case['status']; ?>" onchange="this.form.submit()">
+                                            <ion-select-option value="new">جديدة</ion-select-option>
+                                            <ion-select-option value="in_progress">قيد المعالجة</ion-select-option>
+                                            <ion-select-option value="closed">مغلقة</ion-select-option>
+                                            <ion-select-option value="archived">مؤرشفة</ion-select-option>
+                                        </ion-select>
+                                    </ion-item>
+                                </form>
+                            </ion-card-content>
+                        </ion-card>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                    <p>لا توجد قضايا تطابق الفلتر المحدد.</p>
+                    <div class="empty-state">
+                        <ion-icon name="folder-open"></ion-icon>
+                        <h3>لا توجد قضايا</h3>
+                        <p>لا توجد قضايا تطابق الفلتر المحدد</p>
+                    </div>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
+            
+            <?php include '../includes/bottom_nav.php'; ?>
+        </ion-content>
+    </ion-app>
 </body>
 </html>
