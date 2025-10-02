@@ -1,13 +1,12 @@
 <?php
+// ملف تسجيل الخروج - يونس ضاعني
+require_once 'config.php';
+
+// إنهاء الجلسة
 session_start();
-
-// تدمير جميع متغيرات الجلسة
 $_SESSION = array();
-
-// تدمير الجلسة
 session_destroy();
 
-// إعادة التوجيه إلى صفحة تسجيل الدخول
-header("Location: login.php");
-exit();
+// إعادة التوجيه إلى صفحة تسجيل الدخول أو الصفحة الرئيسية
+redirect('login.php');
 ?>

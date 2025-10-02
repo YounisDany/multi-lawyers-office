@@ -1,11 +1,41 @@
+<?php
+// تفاصيل القضية للعميل - يونس ضاعني
+require_once 'config.php';
+
+// التحقق من تسجيل الدخول ودور المستخدم
+if (!isLoggedIn() || !hasRole('client')) {
+    redirect('login.php');
+}
+
+$user_id = $_SESSION['user_id'];
+
+// جلب تفاصيل القضية
+$case_id = $_GET['id'] ?? 0;
+$stmt = $pdo->prepare("SELECT c.*, u.name as lawyer_name FROM cases c 
+                       JOIN users u ON c.lawyer_id = u.id 
+                       WHERE c.id = ? AND c.client_id = ?");
+$stmt->execute([$case_id, $user_id]);
+$case = $stmt->fetch();
+
+// جلب الرسائل المتعلقة بالقضية
+$stmt = $pdo->prepare("SELECT m.*, u.name as sender_name FROM messages m 
+                       JOIN users u ON m.sender_id = u.id 
+                       WHERE m.case_id = ? ORDER BY m.created_at ASC");
+$stmt->execute([$case_id]);
+$messages = $stmt->fetchAll();
+
+// تضمين ملف الرأس
+view_partial('header');
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تفاصيل القضية - <?php echo SITENAME; ?></title>
-    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/style.css">
-    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/mobile-ionic.css">
+    <link rel="stylesheet" href="public/assets/css/style.css">
+    <link rel="stylesheet" href="public/assets/css/mobile-ionic.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
@@ -15,7 +45,7 @@
         <ion-header>
             <ion-toolbar color="primary">
                 <ion-buttons slot="start">
-                    <ion-back-button default-href="<?php echo URLROOT; ?>/client/dashboard"></ion-back-button>
+                    <ion-back-button default-href="client_dashboard.php"></ion-back-button>
                 </ion-buttons>
                 <ion-title>تفاصيل القضية</ion-title>
             </ion-toolbar>
@@ -59,7 +89,7 @@
                             <h3 class="ion-padding-top">تفاصيل القضية:</h3>
                             <p><?php echo nl2br(htmlspecialchars($case->details)); ?></p>
                             
-                            <ion-button expand="block" href="<?php echo URLROOT; ?>/client/messages?case_id=<?php echo $case->id; ?>" class="ion-margin-top">
+                            <ion-button expand="block" href="messages.php?case_id=<?php echo $case->id; ?>" class="ion-margin-top">
                                 <ion-icon slot="start" name="chatbubbles"></ion-icon>
                                 محادثة القضية
                             </ion-button>
@@ -101,7 +131,7 @@
                     <div class="empty-state">
                         <ion-icon name="alert-circle-outline"></ion-icon>
                         <h3>القضية غير موجودة أو ليس لديك صلاحية لعرضها.</h3>
-                        <ion-button href="<?php echo URLROOT; ?>/client/dashboard" fill="outline" class="ion-margin-top">
+                        <ion-button href="client_dashboard.php" fill="outline" class="ion-margin-top">
                             العودة إلى لوحة التحكم
                         </ion-button>
                     </div>
@@ -112,6 +142,6 @@
         </ion-content>
     </ion-app>
     
-    <script src="<?php echo URLROOT; ?>/assets/js/main.js"></script>
+    <script src="public/assets/js/main.js"></script>
 </body>
 </html>

@@ -1,11 +1,55 @@
+<?php
+// استشارات العميل - يونس ضاعني
+require_once 'config.php';
+
+// التحقق من تسجيل الدخول ودور المستخدم
+if (!isLoggedIn() || !hasRole('client')) {
+    redirect('login.php');
+}
+
+$user_id = $_SESSION['user_id'];
+$error = '';
+$success = '';
+
+// جلب قائمة المحامين لعرضها في النموذج
+$stmt = $pdo->query("SELECT id, name FROM users WHERE role = 'lawyer'");
+$lawyers = $stmt->fetchAll();
+
+// معالجة طلب استشارة جديدة
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $lawyer_id = sanitize_input($_POST['lawyer_id']);
+    $question = sanitize_input($_POST['question']);
+
+    if (empty($lawyer_id) || empty($question)) {
+        $error = 'يرجى ملء جميع الحقول.';
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO consultations (client_id, lawyer_id, question, status) VALUES (?, ?, ?, 'pending')");
+        if ($stmt->execute([$user_id, $lawyer_id, $question])) {
+            $success = 'تم إرسال الاستشارة بنجاح. سيتم الرد عليها قريباً.';
+            // يمكنك إضافة منطق لإرسال إشعار للمحامي هنا
+        } else {
+            $error = 'حدث خطأ أثناء إرسال الاستشارة.';
+        }
+    }
+}
+
+// جلب استشارات العميل السابقة
+$stmt = $pdo->prepare("SELECT co.*, u.name as lawyer_name FROM consultations co JOIN users u ON co.lawyer_id = u.id WHERE co.client_id = ? ORDER BY co.created_at DESC");
+$stmt->execute([$user_id]);
+$consultations = $stmt->fetchAll();
+
+// تضمين ملف الرأس
+view_partial('header');
+?>
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>استشاراتي - <?php echo SITENAME; ?></title>
-    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/style.css">
-    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/mobile-ionic.css">
+    <link rel="stylesheet" href="public/assets/css/style.css">
+    <link rel="stylesheet" href="public/assets/css/mobile-ionic.css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
@@ -15,7 +59,7 @@
         <ion-header>
             <ion-toolbar color="primary">
                 <ion-buttons slot="start">
-                    <ion-back-button default-href="<?php echo URLROOT; ?>/client/dashboard"></ion-back-button>
+                    <ion-back-button default-href="client_dashboard.php"></ion-back-button>
                 </ion-buttons>
                 <ion-title>استشاراتي</ion-title>
             </ion-toolbar>
@@ -28,7 +72,21 @@
                         <ion-card-title>طلب استشارة جديدة</ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
-                        <form action="<?php echo URLROOT; ?>/client/consultations" method="POST">
+                        <?php if ($error): ?>
+                            <ion-item color="danger" class="ion-margin-bottom">
+                                <ion-icon name="alert-circle" slot="start"></ion-icon>
+                                <ion-label><?php echo $error; ?></ion-label>
+                            </ion-item>
+                        <?php endif; ?>
+                        
+                        <?php if ($success): ?>
+                            <ion-item color="success" class="ion-margin-bottom">
+                                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                                <ion-label><?php echo $success; ?></ion-label>
+                            </ion-item>
+                        <?php endif; ?>
+                        
+                        <form action="client_consultations.php" method="POST">
                             <ion-item class="ion-margin-bottom">
                                 <ion-label position="stacked">اختر المحامي</ion-label>
                                 <ion-select name="lawyer_id" placeholder="اختر محامي" required>
@@ -92,6 +150,6 @@
         </ion-content>
     </ion-app>
     
-    <script src="<?php echo URLROOT; ?>/assets/js/main.js"></script>
+    <script src="public/assets/js/main.js"></script>
 </body>
 </html>

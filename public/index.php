@@ -1,68 +1,93 @@
 <?php
+require_once __DIR__ . "/../config.php";
 
-require_once dirname(__DIR__) . '/app/config/app.php';
-require_once APPROOT . '/core/Router.php';
-require_once APPROOT . '/core/Database.php';
-require_once APPROOT . '/core/Controller.php';
+// منطق الصفحة الرئيسية
+$title = "الرئيسية";
+$description = "منصة متكاملة لإدارة مكاتب المحاماة";
 
-// Load Controllers, Models, and Core classes
-spl_autoload_register(function($className){
-    if (file_exists(APPROOT . '/controllers/' . $className . '.php')) {
-        require_once APPROOT . '/controllers/' . $className . '.php';
-    } elseif (file_exists(APPROOT . '/models/' . $className . '.php')) {
-        require_once APPROOT . '/models/' . $className . '.php';
-    } elseif (file_exists(APPROOT . '/core/' . $className . '.php')) {
-        require_once APPROOT . '/core/' . $className . '.php';
-    }
-});
-
-$router = new Router();
-
-// Define routes
-$router->add('', ['controller' => 'Home', 'action' => 'index']);
-$router->add('home', ['controller' => 'Home', 'action' => 'index']);
-$router->add('register', ['controller' => 'Auth', 'action' => 'register']);
-$router->add('login', ['controller' => 'Auth', 'action' => 'login']);
-$router->add('logout', ['controller' => 'Auth', 'action' => 'logout']);
-
-// Client routes
-$router->add('client/dashboard', ['controller' => 'Client', 'action' => 'dashboard']);
-$router->add('client/new_case', ['controller' => 'Client', 'action' => 'newCase']);
-$router->add('client/case_details/{id:\d+}', ['controller' => 'Client', 'action' => 'caseDetails']);
-$router->add('client/consultations', ['controller' => 'Client', 'action' => 'consultations']);
-$router->add('client/messages/{case_id:\d+}', ['controller' => 'Client', 'action' => 'messages']);
-
-// Lawyer routes
-$router->add('lawyer/dashboard', ['controller' => 'Lawyer', 'action' => 'dashboard']);
-$router->add('lawyer/cases', ['controller' => 'Lawyer', 'action' => 'cases']);
-$router->add('lawyer/consultations', ['controller' => 'Lawyer', 'action' => 'consultations']);
-$router->add('lawyer/reports', ['controller' => 'Lawyer', 'action' => 'reports']);
-$router->add('lawyer/archive', ['controller' => 'Lawyer', 'action' => 'archive']);
-
-// Admin routes
-$router->add('admin/dashboard', ['controller' => 'Admin', 'action' => 'dashboard']);
-$router->add('admin/lawyers', ['controller' => 'Admin', 'action' => 'lawyers']);
-$router->add('admin/cases', ['controller' => 'Admin', 'action' => 'cases']);
-$router->add('admin/reports', ['controller' => 'Admin', 'action' => 'reports']);
-
-// Get current URL
-$url = $_SERVER['REQUEST_URI'];
-
-// Remove query string if present
-if (($pos = strpos($url, '?')) !== false) {
-    $url = substr($url, 0, $pos);
-}
-
-// Remove the base directory from the URL if it exists
-$script_name = $_SERVER['SCRIPT_NAME'];
-$base_path = str_replace('index.php', '', $script_name);
-
-if (strpos($url, $base_path) === 0) {
-    $url = substr($url, strlen($base_path));
-}
-
-$url = trim($url, '/');
-
-$router->dispatch($url);
-
+// تضمين ملف الرأس
+view_partial("header");
 ?>
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title; ?> - <?php echo SITENAME; ?></title>
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/public/assets/css/mobile-ionic.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
+</head>
+<body>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-title><?php echo SITENAME; ?></ion-title>
+                <ion-buttons slot="end">
+                    <?php if (isLoggedIn()): ?>
+                        <ion-button href="<?php echo URLROOT; ?>/logout.php">
+                            <ion-icon name="log-out"></ion-icon>
+                        </ion-button>
+                    <?php else: ?>
+                        <ion-button href="<?php echo URLROOT; ?>/login.php">
+                            <ion-icon name="log-in"></ion-icon>
+                        </ion-button>
+                    <?php endif; ?>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        
+        <ion-content class="ion-padding">
+            <div class="content-section">
+                <ion-card class="welcome-card">
+                    <ion-card-header>
+                        <ion-card-title>مرحباً بك في <?php echo SITENAME; ?></ion-card-title>
+                        <ion-card-subtitle>منصة متكاملة لإدارة مكاتب المحاماة</ion-card-subtitle>
+                    </ion-card-header>
+                    <ion-card-content>
+                        <p>نحن نقدم حلولاً قانونية متكاملة لعملائنا الكرام. سواء كنت تبحث عن استشارة قانونية، أو تحتاج إلى متابعة قضية، منصتنا توفر لك كل ما تحتاجه.</p>
+                        <ion-button expand="block" href="<?php echo URLROOT; ?>/login.php" class="ion-margin-top">
+                            تسجيل الدخول
+                        </ion-button>
+                        <ion-button expand="block" fill="outline" href="<?php echo URLROOT; ?>/register.php" class="ion-margin-top">
+                            إنشاء حساب جديد
+                        </ion-button>
+                    </ion-card-content>
+                </ion-card>
+                
+                <h2 class="section-title ion-margin-top">خدماتنا</h2>
+                <div class="services-grid">
+                    <ion-card class="feature-card">
+                        <ion-card-content>
+                            <ion-icon name="document-text-outline" color="primary"></ion-icon>
+                            <h3>إدارة القضايا</h3>
+                            <p>تتبع قضاياك القانونية بسهولة وفعالية.</p>
+                        </ion-card-content>
+                    </ion-card>
+                    <ion-card class="feature-card">
+                        <ion-card-content>
+                            <ion-icon name="chatbubbles-outline" color="secondary"></ion-icon>
+                            <h3>استشارات قانونية</h3>
+                            <p>احصل على استشارات من محامين متخصصين.</p>
+                        </ion-card-content>
+                    </ion-card>
+                    <ion-card class="feature-card">
+                        <ion-card-content>
+                            <ion-icon name="people-outline" color="tertiary"></ion-icon>
+                            <h3>فريق محامين</h3>
+                            <p>تواصل مع فريق من أفضل المحامين.</p>
+                        </ion-card-content>
+                    </ion-card>
+                </div>
+            </div>
+            
+            <?php view_partial("footer"); ?>
+        </ion-content>
+    </ion-app>
+    
+    <script src="<?php echo URLROOT; ?>/public/assets/js/main.js"></script>
+</body>
+</html>
