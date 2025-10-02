@@ -1,57 +1,20 @@
-<?php
-require_once 'config.php';
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    
-    if (!empty($email) && !empty($password)) {
-        $stmt = $pdo->prepare("SELECT id, name, email, password, role FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
-        
-        if ($user && verifyPassword($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_role'] = $user['role'];
-            
-            // إعادة التوجيه حسب دور المستخدم
-            switch ($user['role']) {
-                case 'admin':
-                    redirect('admin/dashboard.php');
-                    break;
-                case 'lawyer':
-                    redirect('lawyer/dashboard.php');
-                    break;
-                case 'client':
-                    redirect('client/dashboard.php');
-                    break;
-            }
-        } else {
-            $error = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
-        }
-    } else {
-        $error = 'يرجى ملء جميع الحقول';
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <?php include 'includes/ionic_header.php'; ?>
-    <link rel="stylesheet" href="assets/css/mobile-ionic.css">
-    <title>تسجيل الدخول - منصة مكاتب المحاماة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - <?php echo SITENAME; ?></title>
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo URLROOT; ?>/assets/css/mobile-ionic.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
 </head>
 <body>
     <ion-app>
         <ion-content>
             <!-- Back Button -->
-            <ion-button href="index.php" fill="clear" class="back-button" color="light">
+            <ion-button href="<?php echo URLROOT; ?>/" fill="clear" class="back-button" color="light">
                 <ion-icon slot="icon-only" name="arrow-forward"></ion-icon>
             </ion-button>
             
@@ -68,19 +31,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <!-- Login Card -->
                 <ion-card class="login-card">
                     <ion-card-content>
-                        <?php if ($error): ?>
+                        <?php if (!empty($data['email_err']) || !empty($data['password_err'])): ?>
                             <ion-item color="danger" class="ion-margin-bottom">
                                 <ion-icon slot="start" name="alert-circle"></ion-icon>
-                                <ion-label><?php echo $error; ?></ion-label>
+                                <ion-label>
+                                    <?php echo !empty($data['email_err']) ? $data['email_err'] : $data['password_err']; ?>
+                                </ion-label>
                             </ion-item>
                         <?php endif; ?>
                         
-                        <form method="POST">
+                        <form action="<?php echo URLROOT; ?>/login" method="POST">
                             <ion-item class="ion-margin-bottom">
                                 <ion-label position="stacked">البريد الإلكتروني</ion-label>
                                 <ion-input 
                                     type="email" 
                                     name="email" 
+                                    value="<?php echo $data['email']; ?>"
                                     placeholder="example@domain.com"
                                     required
                                 ></ion-input>
@@ -117,14 +83,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="register-link">
                             <p class="register-text">
                                 ليس لديك حساب؟ 
-                                <a href="register.php">سجل الآن</a>
+                                <a href="<?php echo URLROOT; ?>/register">سجل الآن</a>
                             </p>
                         </div>
                     </ion-card-content>
                 </ion-card>
             </div>
-            <?php include 'includes/bottom_nav.php'; ?>
+            
+            <?php view_partial("footer"); ?>
         </ion-content>
     </ion-app>
+    
+    <script src="<?php echo URLROOT; ?>/assets/js/main.js"></script>
 </body>
 </html>
