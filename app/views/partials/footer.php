@@ -76,16 +76,33 @@
                 </ion-toolbar>
             </ion-footer>
 
-            <!-- Footer -->
-            <div class="footer">
-                <div class="footer-content">
-                    <p>&copy; 2024 منصة مكاتب المحاماة. جميع الحقوق محفوظة.</p>
-                    <p>تطوير: <strong>يونس ضاعني</strong></p>
+            <!-- Premium Footer -->
+            <div class="premium-footer">
+                <div class="premium-footer-content">
+                    <h3 class="animate__animated animate__fadeInUp">منصة مكاتب المحاماة</h3>
+                    <p class="animate__animated animate__fadeInUp animate__delay-1s">&copy; 2024 جميع الحقوق محفوظة</p>
+                    <p class="animate__animated animate__fadeInUp animate__delay-2s">تطوير: <strong>يونس ضاعني</strong></p>
                 </div>
             </div>
         </ion-content>
     </ion-app>
     
+    <!-- Bootstrap JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- AOS (Animate On Scroll) Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+    </script>
+    
+    <!-- Custom Premium JavaScript -->
+    <script src="<?php echo URLROOT; ?>/public/assets/js/premium.js"></script>
     <script src="<?php echo URLROOT; ?>/public/assets/js/main.js"></script>
 </body>
 </html>

@@ -67,7 +67,7 @@ function sanitize_input($data) {
 }
 
 // دالة لعرض رسائل الفلاش
-function flash($name = ", $message = ", $class = 'success'){
+function flash($name = '', $message = '', $class = 'success'){
     if(!empty($name)){
         if(!empty($message) && empty($_SESSION[$name])){
             if(!empty($_SESSION[$name.'_class'])){
