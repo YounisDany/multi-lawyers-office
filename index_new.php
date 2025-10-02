@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#667eea">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="assets/images/lawyer-icon-1.png">
-    <link rel="icon" type="image/png" href="assets/images/lawyer-icon-1.png">
     <title>منصة مكاتب المحاماة أونلاين</title>
     
     <!-- Ionic Framework -->
@@ -428,11 +424,11 @@
                     <ion-icon name="home"></ion-icon>
                     <span>الرئيسية</span>
                 </a>
-                <a href="services.php" class="nav-item">
+                <a href="#services" class="nav-item">
                     <ion-icon name="briefcase"></ion-icon>
                     <span>الخدمات</span>
                 </a>
-                <a href="lawyers.php" class="nav-item">
+                <a href="#lawyers" class="nav-item">
                     <ion-icon name="people"></ion-icon>
                     <span>المحامون</span>
                 </a>
