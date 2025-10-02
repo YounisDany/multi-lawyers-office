@@ -54,100 +54,101 @@ $consultations = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/mobile-ionic.css">
     <title>الاستشارات - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="sidebar">
-            <h3>مرحباً <?php echo htmlspecialchars($_SESSION['user_name']); ?></h3>
-            <ul>
-                <li><a href="dashboard.php">الرئيسية</a></li>
-                <li><a href="new_case.php">قضية جديدة</a></li>
-                <li><a href="consultations.php" class="active">الاستشارات</a></li>
-                <li><a href="messages.php">الرسائل</a></li>
-                <li><a href="../logout.php">تسجيل الخروج</a></li>
-            </ul>
-        </div>
-        
-        <div class="main-content">
-            <div class="header">
-                <h1>الاستشارات القانونية</h1>
-                <p>اطلب استشارة قانونية أو تابع استشاراتك السابقة</p>
-            </div>
-            
-            <div class="card">
-                <h2>طلب استشارة جديدة</h2>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-back-button default-href="dashboard.php"></ion-back-button>
+                </ion-buttons>
+                <ion-title>الاستشارات القانونية</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+            <div class="content-section">
+                <h2 class="section-title">طلب استشارة جديدة</h2>
                 
                 <?php if ($error): ?>
-                    <div class="error-message"><?php echo $error; ?></div>
+                    <ion-item color="danger">
+                        <ion-label><?php echo $error; ?></ion-label>
+                    </ion-item>
                 <?php endif; ?>
                 
                 <?php if ($success): ?>
-                    <div class="success-message"><?php echo $success; ?></div>
+                    <ion-item color="success">
+                        <ion-label><?php echo $success; ?></ion-label>
+                    </ion-item>
                 <?php endif; ?>
                 
-                <form method="POST" class="consultation-form">
-                    <div class="form-group">
-                        <label for="lawyer_id">اختر المحامي:</label>
-                        <select id="lawyer_id" name="lawyer_id" required>
-                            <option value="">اختر المحامي</option>
-                            <?php foreach ($lawyers as $lawyer): ?>
-                                <option value="<?php echo $lawyer['id']; ?>">
-                                    <?php echo htmlspecialchars($lawyer['name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="question">سؤالك القانوني:</label>
-                        <textarea id="question" name="question" rows="6" required 
-                                  placeholder="اكتب سؤالك القانوني بشكل واضح ومفصل..."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary">إرسال الاستشارة</button>
-                </form>
-            </div>
+                <ion-card>
+                    <ion-card-content>
+                        <form method="POST">
+                            <ion-item>
+                                <ion-select label="اختر المحامي:" label-placement="stacked" placeholder="اختر المحامي" name="lawyer_id" required>
+                                    <?php foreach ($lawyers as $lawyer): ?>
+                                        <ion-select-option value="<?php echo $lawyer['id']; ?>">
+                                            <?php echo htmlspecialchars($lawyer['name']); ?>
+                                        </ion-select-option>
+                                    <?php endforeach; ?>
+                                </ion-select>
+                            </ion-item>
+                            
+                            <ion-item class="ion-margin-top">
+                                <ion-textarea label="سؤالك القانوني:" label-placement="stacked" name="question" rows="6" required 
+                                            placeholder="اكتب سؤالك القانوني بشكل واضح ومفصل..."></ion-textarea>
+                            </ion-item>
+                            
+                            <ion-button expand="block" type="submit" class="ion-margin-top">
+                                <ion-icon slot="start" name="send"></ion-icon>
+                                إرسال الاستشارة
+                            </ion-button>
+                        </form>
+                    </ion-card-content>
+                </ion-card>
             
-            <div class="card">
-                <h2>استشاراتك السابقة</h2>
+                <h2 class="section-title ion-margin-top">استشاراتك السابقة</h2>
                 
                 <?php if (count($consultations) > 0): ?>
-                    <div class="consultations-list">
+                    <ion-list>
                         <?php foreach ($consultations as $consultation): ?>
-                            <div class="consultation-item">
-                                <div class="consultation-header">
-                                    <h4>استشارة مع <?php echo htmlspecialchars($consultation['lawyer_name']); ?></h4>
-                                    <span class="consultation-status status-<?php echo $consultation['status']; ?>">
-                                        <?php echo $consultation['status'] == 'pending' ? 'في الانتظار' : 'تم الرد'; ?>
-                                    </span>
-                                </div>
-                                
-                                <div class="consultation-question">
-                                    <strong>السؤال:</strong>
-                                    <p><?php echo nl2br(htmlspecialchars($consultation['question'])); ?></p>
-                                </div>
-                                
-                                <?php if ($consultation['answer']): ?>
-                                    <div class="consultation-answer">
-                                        <strong>الإجابة:</strong>
-                                        <p><?php echo nl2br(htmlspecialchars($consultation['answer'])); ?></p>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <div class="consultation-date">
-                                    تاريخ الإرسال: <?php echo date('Y-m-d H:i', strtotime($consultation['created_at'])); ?>
-                                </div>
-                            </div>
+                            <ion-item-sliding>
+                                <ion-item detail href="consultation_details.php?id=<?php echo $consultation['id']; ?>">
+                                    <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
+                                    <ion-label>
+                                        <h3>استشارة مع <?php echo htmlspecialchars($consultation['lawyer_name']); ?></h3>
+                                        <p><?php echo htmlspecialchars(substr($consultation['question'], 0, 70)); ?>...</p>
+                                        <p class="ion-text-right">
+                                            <span class="status-badge status-<?php echo $consultation['status']; ?>">
+                                                <?php echo $consultation['status'] == 'pending' ? 'في الانتظار' : 'تم الرد'; ?>
+                                            </span>
+                                        </p>
+                                    </ion-label>
+                                    <ion-note slot="end"><?php echo date('Y-m-d', strtotime($consultation['created_at'])); ?></ion-note>
+                                </ion-item>
+                                <ion-item-options side="end">
+                                    <ion-item-option href="consultation_details.php?id=<?php echo $consultation['id']; ?>">
+                                        <ion-icon slot="icon-only" name="eye"></ion-icon>
+                                    </ion-item-option>
+                                </ion-item-options>
+                            </ion-item-sliding>
                         <?php endforeach; ?>
-                    </div>
+                    </ion-list>
                 <?php else: ?>
-                    <p>لا توجد استشارات سابقة.</p>
+                    <div class="empty-state">
+                        <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+                        <h3>لا توجد استشارات سابقة.</h3>
+                        <p>يمكنك طلب استشارة جديدة الآن.</p>
+                    </div>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
+            
+            <?php include '../includes/bottom_nav.php'; ?>
+        </ion-content>
+    </ion-app>
 </body>
 </html>

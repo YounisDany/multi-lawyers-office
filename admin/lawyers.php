@@ -47,93 +47,106 @@ $lawyers = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/mobile-ionic.css">
     <title>إدارة المحامين - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="sidebar">
-            <h3>لوحة الإدارة</h3>
-            <ul>
-                <li><a href="dashboard.php">الرئيسية</a></li>
-                <li><a href="lawyers.php" class="active">إدارة المحامين</a></li>
-                <li><a href="clients.php">إدارة العملاء</a></li>
-                <li><a href="cases.php">مراقبة القضايا</a></li>
-                <li><a href="reports.php">التقارير</a></li>
-                <li><a href="../logout.php">تسجيل الخروج</a></li>
-            </ul>
-        </div>
-        
-        <div class="main-content">
-            <div class="header">
-                <h1>إدارة المحامين</h1>
-                <p>عرض وإدارة جميع المحامين المسجلين في المنصة</p>
+    <ion-app>
+        <ion-content>
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-content">
+                    <ion-button href="dashboard.php" fill="clear" color="light" class="back-button">
+                        <ion-icon slot="icon-only" name="arrow-forward"></ion-icon>
+                    </ion-button>
+                    <div>
+                        <h1>إدارة المحامين</h1>
+                        <p>عرض وإدارة جميع المحامين المسجلين في المنصة</p>
+                    </div>
+                </div>
             </div>
             
-            <?php if ($success): ?>
-                <div class="success-message"><?php echo $success; ?></div>
-            <?php endif; ?>
-            
-            <?php if ($error): ?>
-                <div class="error-message"><?php echo $error; ?></div>
-            <?php endif; ?>
-            
-            <div class="card">
-                <h2>قائمة المحامين (<?php echo count($lawyers); ?>)</h2>
+            <!-- Content -->
+            <div class="content-section">
+                <?php if ($success): ?>
+                    <ion-item color="success">
+                        <ion-label><?php echo $success; ?></ion-label>
+                    </ion-item>
+                <?php endif; ?>
+                
+                <?php if ($error): ?>
+                    <ion-item color="danger">
+                        <ion-label><?php echo $error; ?></ion-label>
+                    </ion-item>
+                <?php endif; ?>
+                
+                <h2 class="section-title">قائمة المحامين (<?php echo count($lawyers); ?>)</h2>
                 
                 <?php if (count($lawyers) > 0): ?>
-                    <div class="lawyers-grid">
+                    <ion-list>
                         <?php foreach ($lawyers as $lawyer): ?>
-                            <div class="lawyer-card">
-                                <div class="lawyer-header">
-                                    <h4><?php echo htmlspecialchars($lawyer['name']); ?></h4>
-                                    <span class="lawyer-status">نشط</span>
-                                </div>
-                                
-                                <div class="lawyer-info">
-                                    <p><strong>البريد:</strong> <?php echo htmlspecialchars($lawyer['email']); ?></p>
-                                    <p><strong>تاريخ التسجيل:</strong> <?php echo date('Y-m-d', strtotime($lawyer['created_at'])); ?></p>
-                                </div>
-                                
-                                <div class="lawyer-stats">
-                                    <div class="stat-item">
-                                        <span class="stat-number"><?php echo $lawyer['total_cases']; ?></span>
-                                        <span class="stat-label">إجمالي القضايا</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number"><?php echo $lawyer['active_cases']; ?></span>
-                                        <span class="stat-label">القضايا النشطة</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number"><?php echo $lawyer['total_consultations']; ?></span>
-                                        <span class="stat-label">الاستشارات</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="lawyer-actions">
-                                    <a href="lawyer_details.php?id=<?php echo $lawyer['id']; ?>" class="btn-small">عرض التفاصيل</a>
-                                    
+                            <ion-item-sliding>
+                                <ion-item detail href="lawyer_details.php?id=<?php echo $lawyer['id']; ?>">
+                                    <ion-avatar slot="start">
+                                        <ion-icon name="person-circle-outline"></ion-icon>
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h3><?php echo htmlspecialchars($lawyer['name']); ?></h3>
+                                        <p><?php echo htmlspecialchars($lawyer['email']); ?></p>
+                                        <div class="ion-text-right">
+                                            <span class="status-badge status-active">نشط</span>
+                                        </div>
+                                    </ion-label>
+                                </ion-item>
+                                <ion-item-options side="end">
+                                    <ion-item-option href="lawyer_details.php?id=<?php echo $lawyer['id']; ?>">
+                                        <ion-icon slot="icon-only" name="eye"></ion-icon>
+                                    </ion-item-option>
                                     <?php if ($lawyer['active_cases'] == 0): ?>
-                                        <form method="POST" style="display: inline;" 
-                                              onsubmit="return confirm('هل أنت متأكد من حذف هذا المحامي؟')">
-                                            <input type="hidden" name="lawyer_id" value="<?php echo $lawyer['id']; ?>">
-                                            <button type="submit" name="delete_lawyer" class="btn-danger">حذف</button>
-                                        </form>
-                                    <?php else: ?>
-                                        <span class="btn-disabled" title="لا يمكن الحذف لوجود قضايا نشطة">حذف</span>
+                                        <ion-item-option color="danger" onclick="confirmDelete(<?php echo $lawyer['id']; ?>)">
+                                            <ion-icon slot="icon-only" name="trash"></ion-icon>
+                                        </ion-item-option>
                                     <?php endif; ?>
-                                </div>
-                            </div>
+                                </ion-item-options>
+                            </ion-item-sliding>
                         <?php endforeach; ?>
-                    </div>
+                    </ion-list>
                 <?php else: ?>
                     <div class="empty-state">
-                        <p>لا يوجد محامين مسجلين في المنصة بعد.</p>
+                        <ion-icon name="people-outline"></ion-icon>
+                        <h3>لا يوجد محامون مسجلون في المنصة بعد.</h3>
                     </div>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
+            
+            <?php include '../includes/bottom_nav.php'; ?>
+        </ion-content>
+    </ion-app>
+
+    <script>
+        function confirmDelete(lawyerId) {
+            if (confirm('هل أنت متأكد من حذف هذا المحامي؟')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.style.display = 'none';
+
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = 'lawyer_id';
+                inputId.value = lawyerId;
+                form.appendChild(inputId);
+
+                const inputDelete = document.createElement('input');
+                inputDelete.type = 'hidden';
+                inputDelete.name = 'delete_lawyer';
+                inputDelete.value = '1';
+                form.appendChild(inputDelete);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>

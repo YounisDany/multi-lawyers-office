@@ -45,131 +45,123 @@ $recent_clients = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/mobile-ionic.css">
     <title>لوحة تحكم الأدمن - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="sidebar">
-            <h3>لوحة الإدارة</h3>
-            <ul>
-                <li><a href="dashboard.php" class="active">الرئيسية</a></li>
-                <li><a href="lawyers.php">إدارة المحامين</a></li>
-                <li><a href="clients.php">إدارة العملاء</a></li>
-                <li><a href="cases.php">مراقبة القضايا</a></li>
-                <li><a href="reports.php">التقارير</a></li>
-                <li><a href="../logout.php">تسجيل الخروج</a></li>
-            </ul>
-        </div>
-        
-        <div class="main-content">
-            <div class="header">
-                <h1>لوحة تحكم الأدمن</h1>
-                <p>مراقبة وإدارة المنصة بشكل عام</p>
-            </div>
-            
-            <!-- الإحصائيات الرئيسية -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $total_lawyers; ?></div>
-                    <div class="stat-label">إجمالي المحامين</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $total_clients; ?></div>
-                    <div class="stat-label">إجمالي العملاء</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $total_cases; ?></div>
-                    <div class="stat-label">إجمالي القضايا</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $total_consultations; ?></div>
-                    <div class="stat-label">إجمالي الاستشارات</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $active_cases; ?></div>
-                    <div class="stat-label">القضايا النشطة</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number"><?php echo $pending_consultations; ?></div>
-                    <div class="stat-label">الاستشارات المعلقة</div>
+    <ion-app>
+        <ion-content>
+            <!-- Header -->
+            <div class="app-header">
+                <div class="header-content">
+                    <ion-button href="../index.php" fill="clear" color="light" class="back-button">
+                        <ion-icon slot="icon-only" name="arrow-forward"></ion-icon>
+                    </ion-button>
+                    <div>
+                        <h1>لوحة تحكم الأدمن</h1>
+                        <p>مراقبة وإدارة المنصة بشكل عام</p>
+                    </div>
                 </div>
             </div>
             
-            <!-- المحامين الجدد -->
-            <div class="card">
-                <h2>أحدث المحامين المسجلين</h2>
+            <!-- Content -->
+            <div class="content-section">
+                <!-- الإحصائيات الرئيسية -->
+                <h2 class="section-title">الإحصائيات العامة</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $total_lawyers; ?></div>
+                        <div class="stat-label">إجمالي المحامين</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $total_clients; ?></div>
+                        <div class="stat-label">إجمالي العملاء</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $total_cases; ?></div>
+                        <div class="stat-label">إجمالي القضايا</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $total_consultations; ?></div>
+                        <div class="stat-label">إجمالي الاستشارات</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $active_cases; ?></div>
+                        <div class="stat-label">القضايا النشطة</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo $pending_consultations; ?></div>
+                        <div class="stat-label">الاستشارات المعلقة</div>
+                    </div>
+                </div>
+                
+                <!-- المحامين الجدد -->
+                <h2 class="section-title">أحدث المحامين المسجلين</h2>
                 <?php if (count($recent_lawyers) > 0): ?>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>الاسم</th>
-                                <th>البريد الإلكتروني</th>
-                                <th>تاريخ التسجيل</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="card">
+                        <ion-list lines="none">
                             <?php foreach ($recent_lawyers as $lawyer): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($lawyer['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($lawyer['email']); ?></td>
-                                    <td><?php echo date('Y-m-d', strtotime($lawyer['created_at'])); ?></td>
-                                    <td>
-                                        <a href="lawyer_details.php?id=<?php echo $lawyer['id']; ?>" class="btn-small">عرض</a>
-                                    </td>
-                                </tr>
+                                <ion-item detail href="lawyers.php?id=<?php echo $lawyer['id']; ?>">
+                                    <ion-avatar slot="start">
+                                        <ion-icon name="person-circle-outline"></ion-icon>
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h3><?php echo htmlspecialchars($lawyer['name']); ?></h3>
+                                        <p><?php echo htmlspecialchars($lawyer['email']); ?></p>
+                                        <p class="ion-text-right"><?php echo date('Y-m-d', strtotime($lawyer['created_at'])); ?></p>
+                                    </ion-label>
+                                </ion-item>
                             <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <div class="card-footer">
-                        <a href="lawyers.php" class="btn-primary">عرض جميع المحامين</a>
+                        </ion-list>
+                        <ion-button expand="block" fill="clear" href="lawyers.php">
+                            عرض جميع المحامين
+                        </ion-button>
                     </div>
                 <?php else: ?>
-                    <p>لا يوجد محامين مسجلين بعد.</p>
+                    <div class="empty-state">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <h3>لا يوجد محامون مسجلون بعد.</h3>
+                    </div>
+                <?php endif; ?>
+                
+                <!-- العملاء الجدد -->
+                <h2 class="section-title">أحدث العملاء المسجلين</h2>
+                <?php if (count($recent_clients) > 0): ?>
+                    <div class="card">
+                        <ion-list lines="none">
+                            <?php foreach ($recent_clients as $client): ?>
+                                <ion-item detail href="clients.php?id=<?php echo $client['id']; ?>">
+                                    <ion-avatar slot="start">
+                                        <ion-icon name="person-circle-outline"></ion-icon>
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h3><?php echo htmlspecialchars($client['name']); ?></h3>
+                                        <p><?php echo htmlspecialchars($client['email']); ?></p>
+                                        <p class="ion-text-right"><?php echo date('Y-m-d', strtotime($client['created_at'])); ?></p>
+                                    </ion-label>
+                                </ion-item>
+                            <?php endforeach; ?>
+                        </ion-list>
+                        <ion-button expand="block" fill="clear" href="clients.php">
+                            عرض جميع العملاء
+                        </ion-button>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <ion-icon name="people-outline"></ion-icon>
+                        <h3>لا يوجد عملاء مسجلون بعد.</h3>
+                    </div>
                 <?php endif; ?>
             </div>
             
-            <!-- العملاء الجدد -->
-            <div class="card">
-                <h2>أحدث العملاء المسجلين</h2>
-                <?php if (count($recent_clients) > 0): ?>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>الاسم</th>
-                                <th>البريد الإلكتروني</th>
-                                <th>تاريخ التسجيل</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($recent_clients as $client): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($client['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($client['email']); ?></td>
-                                    <td><?php echo date('Y-m-d', strtotime($client['created_at'])); ?></td>
-                                    <td>
-                                        <a href="client_details.php?id=<?php echo $client['id']; ?>" class="btn-small">عرض</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <div class="card-footer">
-                        <a href="clients.php" class="btn-primary">عرض جميع العملاء</a>
-                    </div>
-                <?php else: ?>
-                    <p>لا يوجد عملاء مسجلين بعد.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
+            <?php include '../includes/bottom_nav.php'; ?>
+        </ion-content>
+    </ion-app>
 </body>
 </html>

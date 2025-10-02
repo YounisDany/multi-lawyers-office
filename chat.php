@@ -95,149 +95,175 @@ $messages = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include 'includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="assets/css/mobile-ionic.css">
     <title>محادثة القضية - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        .chat-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: white;
-            min-height: 100vh;
+        ion-content {
+            --background: #f8f9fa;
         }
-        
-        .chat-header {
-            background: #667eea;
-            color: white;
-            padding: 20px;
-            border-radius: 10px 10px 0 0;
-            margin-bottom: 0;
-        }
-        
         .chat-messages {
-            height: 400px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-            border: 1px solid #e1e5e9;
-        }
-        
-        .chat-form {
-            background: white;
-            padding: 20px;
-            border: 1px solid #e1e5e9;
-            border-top: none;
-            border-radius: 0 0 10px 10px;
-        }
-        
-        .message-input {
+            padding: 10px;
             display: flex;
-            gap: 10px;
-            align-items: flex-end;
+            flex-direction: column;
+            overflow-y: auto;
+            height: calc(100vh - 180px); /* Adjust based on header/footer height */
         }
-        
-        .message-input textarea {
-            flex: 1;
-            resize: none;
-            min-height: 60px;
-        }
-        
-        .file-input {
+        .message-bubble {
+            background: var(--ion-color-light);
+            padding: 10px 15px;
+            border-radius: 15px;
             margin-bottom: 10px;
+            max-width: 80%;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        
-        .send-button {
-            padding: 10px 20px;
-            background: #667eea;
+        .message-bubble.sent {
+            background: var(--ion-color-primary);
             color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            height: fit-content;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
         }
-        
-        .send-button:hover {
-            background: #5a67d8;
+        .message-bubble.received {
+            background: var(--ion-color-tertiary);
+            color: white;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+        .message-header {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .message-bubble.sent .message-header {
+            color: rgba(255,255,255,0.8);
+        }
+        .message-bubble.received .message-header {
+            color: rgba(255,255,255,0.8);
+        }
+        .message-content {
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .message-attachment a {
+            color: inherit;
+            text-decoration: underline;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .message-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .message-input-area ion-textarea {
+            --padding-start: 10px;
+            --padding-end: 10px;
+            --padding-top: 10px;
+            --padding-bottom: 10px;
+            --background: #f0f2f5;
+            border-radius: 20px;
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+        .file-upload-button {
+            margin-right: 10px;
+        }
+        .file-input-hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2><?php echo htmlspecialchars($case['title']); ?></h2>
-            <p>محادثة بين <?php echo htmlspecialchars($case['client_name']); ?> و <?php echo htmlspecialchars($case['lawyer_name']); ?></p>
-        </div>
-        
-        <?php if ($error): ?>
-            <div class="error-message"><?php echo $error; ?></div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="success-message"><?php echo $success; ?></div>
-        <?php endif; ?>
-        
-        <div class="chat-messages" id="chatMessages">
-            <?php if (count($messages) > 0): ?>
-                <?php foreach ($messages as $message): ?>
-                    <div class="message <?php echo $message['sender_id'] == $user_id ? 'message-sent' : 'message-received'; ?>">
-                        <div class="message-header">
-                            <strong><?php echo htmlspecialchars($message['sender_name']); ?></strong>
-                            <span class="message-time"><?php echo date('Y-m-d H:i', strtotime($message['created_at'])); ?></span>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-back-button default-href="<?php echo $user_role; ?>/dashboard.php"></ion-back-button>
+                </ion-buttons>
+                <ion-title><?php echo htmlspecialchars($case['title']); ?></ion-title>
+                <ion-buttons slot="end">
+                    <ion-button href="<?php echo $user_role; ?>/case_details.php?id=<?php echo $case_id; ?>">
+                        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+            <div class="chat-messages" id="chatMessages">
+                <?php if (count($messages) > 0): ?>
+                    <?php foreach ($messages as $message): ?>
+                        <div class="message-bubble <?php echo $message['sender_id'] == $user_id ? 'sent' : 'received'; ?>">
+                            <div class="message-header">
+                                <strong><?php echo htmlspecialchars($message['sender_name']); ?></strong>
+                                <span><?php echo date('H:i', strtotime($message['created_at'])); ?></span>
+                            </div>
+                            <?php if ($message['message']): ?>
+                                <div class="message-content">
+                                    <?php echo nl2br(htmlspecialchars($message['message'])); ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($message['attachment']): ?>
+                                <div class="message-attachment">
+                                    <a href="uploads/<?php echo htmlspecialchars($message['attachment']); ?>" target="_blank">
+                                        <ion-icon name="attach"></ion-icon> <?php echo htmlspecialchars($message['attachment']); ?>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
-                        
-                        <?php if ($message['message']): ?>
-                            <div class="message-content">
-                                <?php echo nl2br(htmlspecialchars($message['message'])); ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <?php if ($message['attachment']): ?>
-                            <div class="message-attachment">
-                                <a href="uploads/<?php echo htmlspecialchars($message['attachment']); ?>" target="_blank">
-                                    📎 <?php echo htmlspecialchars($message['attachment']); ?>
-                                </a>
-                            </div>
-                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <ion-icon name="chatbubbles-outline"></ion-icon>
+                        <h3>ابدأ المحادثة!</h3>
+                        <p>لا توجد رسائل بعد. أرسل رسالتك الأولى.</p>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p style="text-align: center; color: #6c757d;">لا توجد رسائل بعد. ابدأ المحادثة!</p>
-            <?php endif; ?>
-        </div>
-        
-        <div class="chat-form">
-            <form method="POST" enctype="multipart/form-data">
-                <div class="file-input">
-                    <label for="attachment">إرفاق ملف (اختياري):</label>
-                    <input type="file" id="attachment" name="attachment" 
-                           accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt">
-                    <small>الملفات المدعومة: JPG, PNG, PDF, DOC, TXT (حد أقصى 5MB)</small>
-                </div>
-                
-                <div class="message-input">
-                    <textarea name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
-                    <button type="submit" class="send-button">إرسال</button>
-                </div>
-            </form>
-        </div>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="<?php echo $user_role; ?>/dashboard.php" class="btn-secondary">العودة للرئيسية</a>
-        </div>
-    </div>
+                <?php endif; ?>
+            </div>
+        </ion-content>
+
+        <ion-footer>
+            <ion-toolbar>
+                <form method="POST" enctype="multipart/form-data" class="message-input-area">
+                    <input type="file" id="attachment" name="attachment" class="file-input-hidden" 
+                           accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt" onchange="this.form.submit()">
+                    <ion-button onclick="document.getElementById('attachment').click()" fill="clear" class="file-upload-button">
+                        <ion-icon slot="icon-only" name="attach-outline"></ion-icon>
+                    </ion-button>
+                    <ion-textarea name="message" placeholder="اكتب رسالتك هنا..." rows="1" auto-grow="true"></ion-textarea>
+                    <ion-button type="submit" color="primary">
+                        <ion-icon slot="icon-only" name="send"></ion-icon>
+                    </ion-button>
+                </form>
+            </ion-toolbar>
+            <?php include 'includes/bottom_nav.php'; ?>
+        </ion-footer>
+    </ion-app>
     
     <script>
         // تمرير تلقائي لأسفل عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
             const chatMessages = document.getElementById('chatMessages');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         });
         
-        // تحديث الرسائل كل 5 ثوانٍ
-        setInterval(function() {
-            location.reload();
-        }, 5000);
+        // تحديث الرسائل كل 10 ثوانٍ (يمكن تعديلها أو استخدام WebSockets لتحسين الأداء)
+        // setInterval(function() {
+        //     location.reload();
+        // }, 10000);
     </script>
 </body>
 </html>

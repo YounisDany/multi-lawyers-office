@@ -24,75 +24,79 @@ $cases_with_messages = $stmt->fetchAll();
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <?php include '../includes/ionic_header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/mobile-ionic.css">
     <title>الرسائل - منصة مكاتب المحاماة</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="dashboard">
-        <div class="sidebar">
-            <h3>مرحباً <?php echo htmlspecialchars($_SESSION['user_name']); ?></h3>
-            <ul>
-                <li><a href="dashboard.php">الرئيسية</a></li>
-                <li><a href="new_case.php">قضية جديدة</a></li>
-                <li><a href="consultations.php">الاستشارات</a></li>
-                <li><a href="messages.php" class="active">الرسائل</a></li>
-                <li><a href="../logout.php">تسجيل الخروج</a></li>
-            </ul>
-        </div>
-        
-        <div class="main-content">
-            <div class="header">
-                <h1>الرسائل والمحادثات</h1>
-                <p>تابع محادثاتك مع المحامين حول قضاياك</p>
-            </div>
-            
-            <div class="card">
-                <h2>محادثات القضايا</h2>
+    <ion-app>
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-back-button default-href="dashboard.php"></ion-back-button>
+                </ion-buttons>
+                <ion-title>الرسائل والمحادثات</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+            <div class="content-section">
+                <h2 class="section-title">محادثات القضايا</h2>
                 
                 <?php if (count($cases_with_messages) > 0): ?>
-                    <div class="messages-list">
+                    <ion-list>
                         <?php foreach ($cases_with_messages as $case): ?>
-                            <div class="message-thread">
-                                <div class="thread-header">
-                                    <h4><?php echo htmlspecialchars($case['title']); ?></h4>
-                                    <span class="status-<?php echo $case['status']; ?>">
-                                        <?php 
-                                        $status_names = [
-                                            'new' => 'جديدة',
-                                            'in_progress' => 'قيد المعالجة',
-                                            'closed' => 'مغلقة',
-                                            'archived' => 'مؤرشفة'
-                                        ];
-                                        echo $status_names[$case['status']];
-                                        ?>
-                                    </span>
-                                </div>
-                                
-                                <div class="thread-info">
-                                    <p><strong>المحامي:</strong> <?php echo htmlspecialchars($case['lawyer_name']); ?></p>
-                                    <p><strong>عدد الرسائل:</strong> <?php echo $case['message_count']; ?></p>
-                                    <?php if ($case['last_message_time']): ?>
-                                        <p><strong>آخر رسالة:</strong> <?php echo date('Y-m-d H:i', strtotime($case['last_message_time'])); ?></p>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <div class="thread-actions">
-                                    <a href="../chat.php?case_id=<?php echo $case['id']; ?>" class="btn-primary">فتح المحادثة</a>
-                                    <a href="case_details.php?id=<?php echo $case['id']; ?>" class="btn-secondary">تفاصيل القضية</a>
-                                </div>
-                            </div>
+                            <ion-item-sliding>
+                                <ion-item detail href="../chat.php?case_id=<?php echo $case['id']; ?>">
+                                    <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+                                    <ion-label>
+                                        <h3><?php echo htmlspecialchars($case['title']); ?></h3>
+                                        <p>المحامي: <?php echo htmlspecialchars($case['lawyer_name']); ?></p>
+                                        <p>الرسائل: <?php echo $case['message_count']; ?></p>
+                                        <?php if ($case['last_message_time']): ?>
+                                            <p class="ion-text-right">آخر رسالة: <?php echo date('Y-m-d H:i', strtotime($case['last_message_time'])); ?></p>
+                                        <?php endif; ?>
+                                    </ion-label>
+                                    <ion-note slot="end">
+                                        <span class="status-badge status-<?php echo $case['status']; ?>">
+                                            <?php 
+                                            $status_names = [
+                                                'new' => 'جديدة',
+                                                'in_progress' => 'قيد المعالجة',
+                                                'closed' => 'مغلقة',
+                                                'archived' => 'مؤرشفة'
+                                            ];
+                                            echo $status_names[$case['status']] ?? $case['status'];
+                                            ?>
+                                        </span>
+                                    </ion-note>
+                                </ion-item>
+                                <ion-item-options side="end">
+                                    <ion-item-option href="../chat.php?case_id=<?php echo $case['id']; ?>" color="primary">
+                                        <ion-icon slot="icon-only" name="chatbubbles"></ion-icon>
+                                    </ion-item-option>
+                                    <ion-item-option href="case_details.php?id=<?php echo $case['id']; ?>">
+                                        <ion-icon slot="icon-only" name="eye"></ion-icon>
+                                    </ion-item-option>
+                                </ion-item-options>
+                            </ion-item-sliding>
                         <?php endforeach; ?>
-                    </div>
+                    </ion-list>
                 <?php else: ?>
                     <div class="empty-state">
-                        <p>لا توجد محادثات بعد.</p>
+                        <ion-icon name="chatbubbles-outline"></ion-icon>
+                        <h3>لا توجد محادثات بعد.</h3>
                         <p>عندما تقوم برفع قضية جديدة، ستتمكن من التواصل مع المحامي هنا.</p>
-                        <a href="new_case.php" class="btn-primary">رفع قضية جديدة</a>
+                        <ion-button expand="block" href="new_case.php" class="ion-margin-top">
+                            <ion-icon slot="start" name="add-circle"></ion-icon>
+                            رفع قضية جديدة
+                        </ion-button>
                     </div>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
+            
+            <?php include '../includes/bottom_nav.php'; ?>
+        </ion-content>
+    </ion-app>
 </body>
 </html>
